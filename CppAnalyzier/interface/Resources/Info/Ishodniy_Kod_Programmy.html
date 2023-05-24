@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>Постановка задачи</title>
+<style>
+   h1 {
+    font-family: 'Times New Roman';
+    font-size: 14pt;
+    margin-left: 8px;
+   }
+   
+  </style>
+</head>
+<body>
+    <h1 align="center"> Исходный код программы </h1>
+    <h1>Листинг программной части разработанного синтаксического анализатора длинного целого языка С++.<br>
+using System;<br>
+using System.Collections.Generic;<br>
+using System.Linq;<br>
+using System.Text;<br>
+using System.Text.RegularExpressions;<br>
+using System.Threading.Tasks;<br>
+using System.Windows.Forms;<br>
+<br>
+namespace @interface<br>
+{<br>
+    internal class CodeAnalyzer<br>
+    {<br>
+        string pattern = @"(\+)|(\-)|(L)|(l)|(\d)";<br>
+        private AnalyzerState AnalyzerState = AnalyzerState.FIRST_SYMBOL;<br>
+        private int ColumnCount = 0;<br>
+        private int errorCounter = 0;<br>
+        private bool hasEndLiteral = false;<br>
+        RichTextBox richTextBox;<br>
+        private List<char> lexems = new List<char>();<br>
+<br>
+<br>
+        public CodeAnalyzer(string text, RichTextBox richTextBox)<br>
+        {<br>
+            this.richTextBox = richTextBox;<br>
+            foreach (char match in text)<br>
+            {<br>
+                lexems.Add(match);<br>
+                ColumnCount++;<br>
+<br>
+                if (AnalyzerState == AnalyzerState.FIRST_SYMBOL)<br>
+                {<br>
+                    if (match == '+' || match == '-' || char.IsDigit(match))<br>
+                    {<br>
+<br>
+                    }<br>
+                    else if (char.ToLowerInvariant(match) == 'l')<br>
+                    {<br>
+                        AppendInfo("Число не может начинаться с литерала l");<br>
+                        hasEndLiteral = true;<br>
+                        errorCounter++;<br>
+                    }<br>
+                    else<br>
+                    {<br>
+                        AppendInfo("В числе не может быть что-либо кроме цифр, плюса, минуса или литерала l ");<br>
+                        errorCounter++;<br>
+                    }<br>
+                    AnalyzerState = AnalyzerState.DIGIT;<br>
+                }<br>
+                else if (AnalyzerState == AnalyzerState.DIGIT) <br>
+                {<br>
+                    if (char.IsDigit(match))<br>
+                    {<br>
+<br>
+                    }<br>
+                    else if (match == '+' || match == '-') <br>
+                    {<br>
+                        AppendInfo("Знак числа может быть задан только в его начале");<br>
+                        errorCounter++;<br>
+                    }<br>
+                    else if (char.ToLowerInvariant(match) == 'l')<br>
+                    {<br>
+                        if (ColumnCount == 2)<br>
+                        {<br>
+                            AppendInfo("Число не может быть без цифр");<br>
+                            hasEndLiteral = true;<br>
+                            errorCounter++;<br>
+                        }<br>
+                        else<br>
+                        {<br>
+                            AnalyzerState = AnalyzerState.END_DIGIT;<br>
+                            hasEndLiteral = true;<br>
+                        }<br>
+                    }<br>
+                    else<br>
+                    {<br>
+                        AppendInfo("В числе не может быть что-либо кроме цифр, плюса, минуса или литерала l ");<br>
+                        errorCounter++;<br>
+                    }<br>
+                }<br>
+                else if (AnalyzerState == AnalyzerState.END_DIGIT)<br>
+                {<br>
+                    if (char.IsDigit(match))<br>
+                    {<br>
+                        AppendInfo("После окончания числа не может быть цифр");<br>
+                        errorCounter++;<br>
+                    }<br>
+                    else if (match == '+' || match == '-')<br>
+                    {<br>
+                        AppendInfo("Знак числа может быть задан только в его начале");<br>
+                        errorCounter++;<br>
+                    }<br>
+                    else if (char.ToLowerInvariant(match) == 'l')<br>
+                    {<br>
+                        AppendInfo("В числе не может быть больше одного литерала l");<br>
+                        errorCounter++;<br>
+                    }<br>
+                    else<br>
+                    {<br>
+                        AppendInfo("В числе не может быть что-либо кроме цифр, плюса, минуса или литерала l ");<br>
+                        errorCounter++;<br>
+                    }<br>
+                }<br>
+            }<br>
+            if (errorCounter == 0 && hasEndLiteral)<br>
+            {<br>
+                richTextBox.AppendText("Число записано без ошибок");<br>
+            }<br>
+            if(!hasEndLiteral) <br>
+            {<br>
+                AppendInfo("Конец числа должен быть литералом l или L");<br>
+            }<br>
+        }<br>
+<br>
+        private void AppendInfo(string error = "")<br>
+        {<br>
+            richTextBox.AppendText($"{error}{", ошибка в позиции "}{ColumnCount}{Environment.NewLine}");<br>
+        }<br>
+    }<br>
+}<br>
+
+
+<p><a href="Spisok_Literatury.html">Предыдущий документ</a></p>
+</h1>
+</body>
+</html>
